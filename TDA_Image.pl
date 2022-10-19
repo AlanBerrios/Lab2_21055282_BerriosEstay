@@ -171,3 +171,39 @@ imageIsPixmap([_,_,LP|_]):-
 
 imageIsHexmap([_,_,LP|_]):-
     maplist(ispixhex_d,LP).
+	
+% imageIsCompressed
+
+imageIsCompressed([Ancho,Alto,LP|_]):-
+    largolista(LP,LL),
+    Area = Ancho*Alto,
+    Area>LL.
+	
+% Ordena una imagen con sus pixeles desordenados
+
+reordenar(Imagen,Iout):-
+    getLP(Imagen,LP),
+    getAncho(Imagen,Ancho),
+    getAlto(Imagen,Alto),
+    sort(1,=<,LP,S),
+    sort(0,=<,S,S2),
+    Iout = [Ancho,Alto,S2].	
+	
+% FlipH
+
+flopH(Ancho,Pix,Pout):- 
+    A is Ancho-1,
+    getX(Pix,X),
+    Xnew is abs(X-A),
+    getY(Pix,Y),
+    getTail(Pix,T),
+    getTail(T,T1),
+    Pout = [Y,Xnew,T1].
+    
+imageFlipH(Imagen,Iout):-
+    getAncho(Imagen,An), getAlto(Imagen,Al), getLP(Imagen,LP),
+    R = [An,Al],
+    maplist((flopH(An)),LP,R1),
+    R2 = [R1],
+    append(R,R2,I),
+    reordenar(I,Iout).	
