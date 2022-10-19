@@ -1,4 +1,11 @@
 
+% largo de una lista
+
+largolista([],0).
+largolista([_|Y], N):-
+    largolista(Y, N1),
+    N is N1+1.
+	
 % Selectores ----------------------------------------
 
 % selector: obtener Y
@@ -70,3 +77,97 @@ pixrgb_d(Y,X,R,G,B,D,[Y,X,R,G,B,D]):-
     R>=0, 255>=R, 
     G>=0, 255>=G,
     B>=0, 255>=B.
+	
+
+% Pertenencia ----------------------------------
+
+% Pertenencia: Verifica si la lista es un pixbit-d
+
+ispixbit_d(L):-
+    largolista(L,4),
+    getY(L,Y),
+    getX(L,X),
+    getBit(L,B),
+    getDepth(L,D),
+    pixbit_d(Y,X,B,D,_).
+
+% Pertenencia: Verifica si la lista es un pixhex-d
+
+ispixhex_d(L):-
+    largolista(L,4),
+    getY(L,Y),
+    getX(L,X),
+    getHex(L,H),
+    getDepth(L,D),
+    pixhex_d(Y,X,H,D,_).
+
+% Pertenencia: Verifica si la lista es un pixrgb-d
+
+ispixrgb_d(L):-
+    largolista(L,6),
+    getY(L,Y),
+    getX(L,X),
+    getR(L,R),
+    getG(L,G),
+    getB(L,B),
+    getDepth(L,D),
+    pixrgb_d(Y,X,R,G,B,D,_).
+
+%Pertenencia: homologo?
+%Verifica si los elementos de la lista de entrada son de un mismo tipo de pixel
+
+homologo(LP):-
+    maplist(ispixhex_d,LP), !;
+	maplist(ispixbit_d,LP), !;
+    maplist(ispixrgb_d,LP), !.
+
+comparar_area_pix(Ancho,Alto,P):-
+    getY(P,Y),
+    getX(P,X),
+    Ancho>X,
+    Alto>Y.
+
+%Pertenencia: isdentrodelarea
+%Verifica si los pixeles estan dentro dela rea de la imagen
+
+isdentrodelarea(Ancho,Alto,LP):-
+    maplist(comparar_area_pix(Ancho,Alto),LP).
+
+% Constructor imagen --------------
+% LP: Lista Pixeles
+
+image(Ancho,Alto,LP,Iout):-
+    integer(Alto), integer(Ancho),
+    Largo=Alto*Ancho, largolista(LP,LL), Largo>=LL,
+    homologo(LP),
+    isdentrodelarea(Ancho,Alto,LP),
+    Iout = [Alto,Ancho,LP].
+
+% Selectores imagen
+
+% getAlto
+
+getAlto([Al|_],Alout):-
+    Alout = Al.
+
+%getAncho
+
+getAncho([_,An|_],Anout):-
+    Anout = An.
+
+%getLP (Lista pixeles)
+
+getLP([_,_,LP|_],LPnout):-
+    LPnout = LP.
+
+% Map? ---------
+% imageIs___map
+
+imageIsBitmap([_,_,LP|_]):-
+    maplist(ispixbit_d,LP).
+
+imageIsPixmap([_,_,LP|_]):-
+    maplist(ispixrgb_d,LP).
+
+imageIsHexmap([_,_,LP|_]):-
+    maplist(ispixhex_d,LP).
