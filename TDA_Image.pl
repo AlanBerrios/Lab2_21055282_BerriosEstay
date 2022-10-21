@@ -1,10 +1,40 @@
 
+
+% otros
 % largo de una lista
 
 largolista([],0).
 largolista([_|Y], N):-
     largolista(Y, N1),
     N is N1+1.
+
+% Obtiene el numero minimo de una lista
+
+getMinLista([H|T],Nmin):-
+         getMinLista2(H,T,Nmin).
+getMinLista2(H,[],Nmin):-
+    H = Nmin.
+getMinLista2(H1, [H2|T1], Nmin):-
+          H2 =< H1, !,
+          getMinLista2(H2, T1, Nmin).
+getMinLista2(H1, [H2|T1], Nmin):-
+          H2 >= H1,
+          getMinLista2(H1, T1, Nmin).
+
+% Elimina los elementos repetidos de una lista
+
+delrepe([],[]).
+delrepe([H|T],Lout):-
+    member(H,T) -> delrepe(T,Lout);
+    delrepe(T,L), 
+    append([H],L,Lout).
+
+% Obtener el resto de una lista
+getTail(L,T):-
+    [_|T] = L.
+
+getPrimero([P|_],Pout):-
+    Pout = P.
 	
 % Selectores ----------------------------------------
 
@@ -207,3 +237,63 @@ imageFlipH(Imagen,Iout):-
     R2 = [R1],
     append(R,R2,I),
     reordenar(I,Iout).	
+	
+% FlipV
+
+flopV(Alto,Pix,Pout):-
+    A is Alto-1,
+    getY(Pix,Y),
+    Ynew is abs(Y-A),
+    getX(Pix,X),
+    getTail(Pix,T),
+    getTail(T,T1),
+    append([Ynew,X],T1,Pout).
+    
+imageFlipV(Imagen,Iout):-
+    getAncho(Imagen,An), getAlto(Imagen,Al), getLP(Imagen,LP),
+    R = [An,Al],
+    maplist((flopV(An)),LP,R1),
+    R2 = [R1],
+    append(R,R2,I),
+    reordenar(I,Iout).
+
+% Devuelve true si el pixel corresponde al cuadrante
+% X1 x Y1 x X2 x Y2 x Pixel
+
+seleccionapixel(X1,Y1,X2,Y2,[Y,X|_]):-
+    Y >= Y1, X >= X1, Y =< Y2, X =< X2.
+
+% Devuelve una imagen con los pixeles que pertenecen al cuadrante
+
+cropear(Imagen,X1,Y1,X2,Y2,Icrop):-
+    getAlto(Imagen,Alto), getAncho(Imagen,Ancho),
+    getLP(Imagen,LP),
+    include(seleccionapixel(X1,Y1,X2,Y2),LP,LPcrop),
+    Icrop = [Ancho,Alto,LPcrop].
+
+% Cambia la coordenada Y de un pixel respecto a la coord min de Y
+
+cambiarY(MinY,[Y|T],Pout):-
+    Ynew is Y-MinY, Pout = [Ynew|T].
+	
+% Cambia la coordenada X de un pixel respecto a la coord min de X
+
+cambiarX(MinX,[Y,X|T],Pout):-
+    Xnew is X-MinX, Pout = [Y,Xnew|T].
+
+% CROP ---------------------
+
+imageCrop(Imagen,X1,Y1,X2,Y2,Iout):-
+    cropear(Imagen,X1,Y1,X2,Y2,Icrop),
+    getLP(Icrop,LP),
+    maplist(getY,LP,ListY), %ListY lista con todas las coords Y
+    maplist(getX,LP,ListX), %ListX lista con todas las coords X
+    getMinLista(ListY,MinY),!, %MinY coord minima en Y
+    getMinLista(ListX,MinX),!, %MinX coord minima en X
+    maplist(cambiarX(MinX),LP,OutX), %OutX lista LP con X corregidos
+    maplist(cambiarY(MinY),OutX,LP2), %LP2 lista OutX con Y corregidos
+    delrepe(ListY,ListY2), 
+    delrepe(ListX,ListX2),
+    largolista(ListY2,Alto), 
+    largolista(ListX2,Ancho),
+    Iout = [Ancho,Alto,LP2].
