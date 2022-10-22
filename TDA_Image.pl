@@ -297,3 +297,38 @@ imageCrop(Imagen,X1,Y1,X2,Y2,Iout):-
     largolista(ListY2,Alto), 
     largolista(ListX2,Ancho),
     Iout = [Ancho,Alto,LP2].
+	
+%  imgRGBToHex----------------------------------------
+
+tablaHex(RGB,Strout):-
+    RGB =< 9 ->  number_string(RGB,Strout) ; 
+    RGB = 10 ->  Strout = "A" ;
+    RGB = 11 ->  Strout = "B" ;
+    RGB = 12 ->  Strout = "C" ;
+    RGB = 13 ->  Strout = "D" ;
+    RGB = 14 ->  Strout = "E" ;
+    RGB = 15 ->  Strout = "F" .
+
+rgbtohex(RGB,Srgb,Sout):-
+    RGB =< 15, string_length(Srgb,Largo), Largo = 0 ->   number_string(0,Cero),
+    tablaHex(RGB,RGBs), string_concat(Cero,RGBs,Sout1),string_concat(Sout1,Srgb,Sout);
+    RGB =< 15, string_length(Srgb,Largo), Largo = 1 ->   tablaHex(RGB,RGBs),
+    string_concat(RGBs,Srgb,Sout);
+    RGB >= 16 ->  Q is RGB div 16, R is Q*16, R2 is R - RGB, abs(R2,R3), tablaHex(R3,R3s), 
+    string_concat(R3s,Srgb,S1),rgbtohex(Q,S1,Sout).
+
+pixRGBtoHex([Y,X,R,G,B,D],Pout):-
+    rgbtohex(R,"",Rs),
+    rgbtohex(G,"",Gs),
+    rgbtohex(B,"",Bs),
+    string_concat('#',Rs,S),
+    string_concat(S,Gs,S1),
+    string_concat(S1,Bs,RGBs),
+    Pout = [Y,X,RGBs,D].
+
+imgRGBToHex(Imagen,Iout):-
+    getLP(Imagen,LP),
+    getAncho(Imagen,Ancho),
+    getAlto(Imagen,Alto),
+    maplist(pixRGBtoHex,LP,LPout),
+    Iout = [Ancho,Alto,LPout].
