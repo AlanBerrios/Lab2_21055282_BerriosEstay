@@ -332,3 +332,23 @@ imgRGBToHex(Imagen,Iout):-
     getAlto(Imagen,Alto),
     maplist(pixRGBtoHex,LP,LPout),
     Iout = [Ancho,Alto,LPout].
+	
+% HISTOGRAM ----------------------------------------------
+
+contar(Cont,[],Color,[Color,Cont]):-!.
+contar(Cont,[H|T],Color,ColorCont):-
+    H =@= Color,
+    T =@= [],
+    NCont is Cont+1,
+    ColorCont = [Color,NCont], !.
+contar(Cont,[H|T],Color,ColorCont):-
+    Color =@= H ->  NCont is Cont+1, contar(NCont,T,Color,ColorCont);
+    Color \== H ->  contar(Cont,T,Color,ColorCont).
+
+histogram(Imagen,Histogram):-
+    imageIsHexmap(Imagen) ->  getLP(Imagen,LP), maplist(getHex,LP,LHexs),
+    delrepe(LHexs,Colores),maplist(contar(0,LHexs),Colores,Histogram);
+    imageIsBitmap(Imagen) ->  getLP(Imagen,LP), maplist(getBit,LP,LBits),
+    delrepe(LBits,Colores),maplist(contar(0,LBits),Colores,Histogram);
+    imageIsPixmap(Imagen) ->  getLP(Imagen,LP), maplist(getRGB,LP,LRGBs),
+    delrepe(LRGBs,Colores),maplist(contar(0,LRGBs),Colores,Histogram).
