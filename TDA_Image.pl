@@ -1,5 +1,4 @@
 
-
 % otros
 % largo de una lista
 
@@ -35,7 +34,7 @@ getTail(L,T):-
 
 getPrimero([P|_],Pout):-
     Pout = P.
-	
+
 % Selectores ----------------------------------------
 
 % selector: obtener Y
@@ -61,17 +60,17 @@ getHex([_,_,H|_],Hout):-
 % selector: obtener R
 
 getR([_,_,R|_],Rout):-
-    Rout is R.
+    Rout = R.
 
 % selector: obtener G
 
 getG([_,_,_,G|_],Gout):-
-    Gout is G.
+    Gout = G.
 
 % selector: obtener B
 
 getB([_,_,_,_,B|_],Bout):-
-    Bout is B.
+    Bout = B.
 
 % selector: Obtiene una lista con los canales del pixrgb
 
@@ -107,7 +106,6 @@ pixrgb_d(Y,X,R,G,B,D,[Y,X,R,G,B,D]):-
     R>=0, 255>=R, 
     G>=0, 255>=G,
     B>=0, 255>=B.
-	
 
 % Pertenencia ----------------------------------
 
@@ -201,14 +199,14 @@ imageIsPixmap([_,_,LP|_]):-
 
 imageIsHexmap([_,_,LP|_]):-
     maplist(ispixhex_d,LP).
-	
+
 % imageIsCompressed
 
 imageIsCompressed([Ancho,Alto,LP|_]):-
     largolista(LP,LL),
     Area = Ancho*Alto,
     Area>LL.
-	
+
 % Ordena una imagen con sus pixeles desordenados
 
 reordenar(Imagen,Iout):-
@@ -217,8 +215,8 @@ reordenar(Imagen,Iout):-
     getAlto(Imagen,Alto),
     sort(1,=<,LP,S),
     sort(0,=<,S,S2),
-    Iout = [Ancho,Alto,S2].	
-	
+    Iout = [Ancho,Alto,S2].
+
 % FlipH
 
 flopH(Ancho,Pix,Pout):- 
@@ -236,8 +234,8 @@ imageFlipH(Imagen,Iout):-
     maplist((flopH(An)),LP,R1),
     R2 = [R1],
     append(R,R2,I),
-    reordenar(I,Iout).	
-	
+    reordenar(I,Iout).
+
 % FlipV
 
 flopV(Alto,Pix,Pout):-
@@ -297,7 +295,7 @@ imageCrop(Imagen,X1,Y1,X2,Y2,Iout):-
     largolista(ListY2,Alto), 
     largolista(ListX2,Ancho),
     Iout = [Ancho,Alto,LP2].
-	
+
 %  imgRGBToHex----------------------------------------
 
 tablaHex(RGB,Strout):-
@@ -332,7 +330,7 @@ imgRGBToHex(Imagen,Iout):-
     getAlto(Imagen,Alto),
     maplist(pixRGBtoHex,LP,LPout),
     Iout = [Ancho,Alto,LPout].
-	
+
 % HISTOGRAM ----------------------------------------------
 
 contar(Cont,[],Color,[Color,Cont]):-!.
@@ -352,3 +350,16 @@ histogram(Imagen,Histogram):-
     delrepe(LBits,Colores),maplist(contar(0,LBits),Colores,Histogram);
     imageIsPixmap(Imagen) ->  getLP(Imagen,LP), maplist(getRGB,LP,LRGBs),
     delrepe(LRGBs,Colores),maplist(contar(0,LRGBs),Colores,Histogram).
+
+% ROTATE90 -------------------------------------------------
+
+rotate([Y,X|T],[X,Y|T]).
+
+imageRotate90(Imagen,IR90):-
+    imageFlipV(Imagen,Iflip),
+    getLP(Iflip,LP),
+    maplist(rotate,LP,LP1),
+    getAncho(Imagen,Ancho),
+    getAlto(Imagen,Alto),
+    I2 = [Ancho,Alto,LP1],
+    reordenar(I2,IR90).
