@@ -363,3 +363,44 @@ imageRotate90(Imagen,IR90):-
     getAlto(Imagen,Alto),
     I2 = [Ancho,Alto,LP1],
     reordenar(I2,IR90).
+
+% Compress ------------------------------------------------
+
+% Obtiene el color del pixrgb_d, se utiliza para comparar si este es el mismo color que el color mas repetido (RGB)
+
+compararRGB(RGB,Pix):-
+    getR(Pix,R),
+    getG(Pix,G),
+    getB(Pix,B),
+    RGB = [R,G,B].
+	
+% Obtiene el color del pixrgb_d, se utiliza para comparar si este es el mismo color que el color mas repetido (Bit)
+
+compararBit(Bit,Pix):-
+    getBit(Pix,B),
+    Bit = B.
+
+% Obtiene el color del pixrgb_d, se utiliza para comparar si este es el mismo color que el color mas repetido (Hex)
+
+compararHex(Hex,Pix):-
+    getHex(Pix,H),
+    Hex =@= H.
+
+% Elimina el color mas repetido de la imagen, devuelve la imagen con el color mas repetido eliminado
+
+eliminarColorRepetido(Color,Imagen,Iout):-
+	imageIsHexmap(Imagen) -> getLP(Imagen,LP), exclude(compararHex(Color),LP,LP2),
+    getAncho(Imagen,Ancho), getAlto(Imagen,Alto), Iout = [Ancho,Alto,LP2];
+    imageIsBitmap(Imagen) -> getLP(Imagen,LP), exclude(compararBit(Color),LP,LP2),
+    getAncho(Imagen,Ancho), getAlto(Imagen,Alto), Iout = [Ancho,Alto,LP2];
+    imageIsPixmap(Imagen) -> getLP(Imagen,LP), exclude(compararRGB(Color),LP,LP2),
+    getAncho(Imagen,Ancho), getAlto(Imagen,Alto), Iout = [Ancho,Alto,LP2].
+    
+
+imageCompress(Imagen,ICompressed):-
+    histogram(Imagen,H),
+    sort(1,>=,H,H2), % Ordena de mayor a menor el histograma, para dejar al color mas repetido en el primer lugar de la lista histogram
+    getPrimero(H2,HMR), 
+	getPrimero(HMR,ColorMasrepetido), % Obtiene el color mas repetido
+    eliminarColorRepetido(ColorMasrepetido,Imagen,ICom), % Se elimina el color mas repetido de la imagen
+    append(ICom,[Imagen],ICompressed). % Se devuelve la imagen comprimida X imagen anterior (sin comprimir)
