@@ -404,3 +404,15 @@ imageCompress(Imagen,ICompressed):-
 	getPrimero(HMR,ColorMasrepetido), % Obtiene el color mas repetido
     eliminarColorRepetido(ColorMasrepetido,Imagen,ICom), % Se elimina el color mas repetido de la imagen
     append(ICom,[Imagen],ICompressed). % Se devuelve la imagen comprimida X imagen anterior (sin comprimir)
+	
+% CHANGE PIXEL ---------------------------------------------
+
+cambiarPix([Y1,X1|NT],[Y,X|_],Pout):-
+    Y1 = Y, X1 = X, Pout = [Y,X|NT],!.
+cambiarPix([Y1,X1|_],[Y,X|T],Pout):-
+    Y1 \= Y -> Pout = [Y,X|T];
+    X1 \= X ->  Pout = [Y,X|T].
+ 
+imageChangePixel([An,Al,LP|T],NPix,Iout):-
+    maplist(cambiarPix(NPix),LP,LPNew),
+    Iout = [An,Al,LPNew|T].
