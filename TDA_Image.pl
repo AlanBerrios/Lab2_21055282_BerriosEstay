@@ -416,3 +416,13 @@ cambiarPix([Y1,X1|_],[Y,X|T],Pout):-
 imageChangePixel([An,Al,LP|T],NPix,Iout):-
     maplist(cambiarPix(NPix),LP,LPNew),
     Iout = [An,Al,LPNew|T].
+	
+% invertColorRGB ------------------------------------------
+
+pixinvertColorRGB([Y,X,R,G,B,D],[Y,X,NR,NG,NB,D]):-
+    R1 is R-255,abs(R1,NR),
+    G1 is G-255,abs(G1,NG),
+    B1 is B-255,abs(B1,NB).
+   
+imageInvertColorRGB([An,Al,LP|T],[An,Al,LPI|T]):-
+    maplist(pixinvertColorRGB,LP,LPI).
