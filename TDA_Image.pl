@@ -426,3 +426,20 @@ pixinvertColorRGB([Y,X,R,G,B,D],[Y,X,NR,NG,NB,D]):-
    
 imageInvertColorRGB([An,Al,LP|T],[An,Al,LPI|T]):-
     maplist(pixinvertColorRGB,LP,LPI).
+	
+%  image->string ------------------------------------------
+
+colortoString(Pix,CString):-
+    ispixhex_d(Pix) ->  getHex(Pix,CString);
+    ispixbit_d(Pix) ->  getBit(Pix,Bit),number_string(Bit,CString);
+    ispixrgb_d(Pix) ->  getR(Pix,R), getG(Pix,G),getB(Pix,B),
+    atomics_to_string([R,G,B],"\t", S),concat("[",S,S1),concat(S1,"]",CString).
+
+setNewLine(Ancho,Pix,NCString):-
+    getX(Pix,X), An is Ancho-1, An = X ->  colortoString(Pix,S), concat(S,"\n",NCString);
+    getX(Pix,X), An is Ancho-1, An\= X ->  colortoString(Pix,S), concat(S,"\t",NCString).
+    
+imageToString(Imagen,IString):-
+    getAncho(Imagen,Ancho), getLP(Imagen,LP),
+    maplist(setNewLine(Ancho),LP,L),
+	atomics_to_string(L,"",IString).
