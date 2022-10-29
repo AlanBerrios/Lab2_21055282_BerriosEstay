@@ -443,3 +443,109 @@ imageToString(Imagen,IString):-
     getAncho(Imagen,Ancho), getLP(Imagen,LP),
     maplist(setNewLine(Ancho),LP,L),
 	atomics_to_string(L,"",IString).
+
+%  image->string ------------------------------------------
+
+colortoString(Pix,CString):-
+    ispixhex_d(Pix) ->  getHex(Pix,CString);
+    ispixbit_d(Pix) ->  getBit(Pix,Bit),number_string(Bit,CString);
+    ispixrgb_d(Pix) ->  getR(Pix,R), getG(Pix,G),getB(Pix,B),
+    atomics_to_string([R,G,B],"\t", S),concat("[",S,S1),concat(S1,"]",CString).
+
+setNewLine(Ancho,Pix,NCString):-
+    getX(Pix,X), An is Ancho-1, An = X ->  colortoString(Pix,S), concat(S,"\n",NCString);
+    getX(Pix,X), An is Ancho-1, An\= X ->  colortoString(Pix,S), concat(S,"\t",NCString).
+    
+imageToString(Imagen,IString):-
+    getAncho(Imagen,Ancho), getLP(Imagen,LP),
+    maplist(setNewLine(Ancho),LP,L),
+	atomics_to_string(L,"",IString).
+    
+% DEPTHLAYERS ---------------------------------------------
+ 	
+getDepthList(Imagen,DL):- 
+    getLP(Imagen,LP),
+    maplist(getDepth,LP,DL1),
+    delrepe(DL1,DL2),
+    sort(0,=<,DL2,DL).
+
+selectPixDepth(Depth,Pix,Pout):-
+    getDepth(Pix,D), Depth = D ->  Pout = Pix;
+    getDepth(Pix,D), Depth \= D ->  Pout = [].
+
+selectLPDepth(LP,D,H1):-
+    maplist(selectPixDepth(D),LP,H1).
+
+listOfLPDepth(Imagen,LOLD):-
+    getLP(Imagen,LP),
+	getDepthList(Imagen,DL),
+	maplist(selectLPDepth(LP),DL,LOLD).
+
+rellenarHex(Depth,Pix,NPix):-
+    Pix = [] ->  NPix = [0,0,"#FFFFFF",Depth];
+    Pix \= [] ->  NPix = Pix.
+rellenarBit(Depth,Pix,NPix):-
+    Pix = [] ->  NPix = [0,0,1,Depth];
+    Pix \= [] ->  NPix = Pix.
+rellenarPix(Depth,Pix,NPix):-
+    Pix = [] ->  NPix = [0,0,255,255,255,Depth];
+    Pix \= [] ->  NPix = Pix.
+    
+getDepthLPOD(LPOD,Depth):-
+    sort(0,>=,LPOD,L),
+    getPrimero(L,P),
+    getDepth(P,Depth).
+
+rellenarBit2(LPOD,LPODRellenado):-
+    getDepthLPOD(LPOD,Depth),
+    maplist(rellenarBit(Depth),LPOD,LPODRellenado).
+
+rellenarPix2(LPOD,LPODRellenado):-
+    getDepthLPOD(LPOD,Depth),
+    maplist(rellenarPix(Depth),LPOD,LPODRellenado).
+
+rellenarHex2(LPOD,LPODRellenado):-
+    getDepthLPOD(LPOD,Depth),
+    maplist(rellenarHex(Depth),LPOD,LPODRellenado).  
+
+rellenarPixBlancos(Imagen,LOLDRellenado):-
+    imageIsPixmap(Imagen) ->  listOfLPDepth(Imagen,LOLD),maplist(rellenarPix2,LOLD,LOLDRellenado);
+    imageIsBitmap(Imagen) ->  listOfLPDepth(Imagen,LOLD),maplist(rellenarBit2,LOLD,LOLDRellenado);
+    imageIsHexmap(Imagen) ->  listOfLPDepth(Imagen,LOLD),maplist(rellenarHex2,LOLD,LOLDRellenado).
+
+
+agregarAncAlt(An,Al,LPOD,LPODOut):-
+    LPODOut = [An,Al,LPOD].
+
+% Se crea una lista de imagenes 
+
+agregarAncAlt2(Imagen,LOLDOut):-
+    rellenarPixBlancos(Imagen,LOLD),
+    getAncho(Imagen,An), getAlto(Imagen,Al),
+    maplist(agregarAncAlt(An,Al),LOLD,LOLDOut).
+    
+corregirPixel(MaxY,MaxX,ContX,ContY,L,O1,Out):-
+    MaxY = ContY,MaxX = ContX, getPrimero(L,P),getTail(P,T),getTail(T,T1),
+    O2 = [ContX,ContY|T1], append(O1,[O2],Out).
+
+corregirPixel(MaxY,MaxX,MaxX,ContY,[H|T],O1,Out):-
+    getTail(H,TH),getTail(TH,TTH),
+    NcontY is ContY+1,
+    O2 = [ContY,MaxX|TTH],append(O1,[O2],O3), corregirPixel(MaxY,MaxX,0,NcontY,T,O3,Out).
+                                        
+corregirPixel(MaxY,MaxX,ContX,ContY,[H|T],O1,Out):-
+    getTail(H,TH),getTail(TH,TTH),
+    NcontX is ContX+1,
+    O2 = [ContY,ContX|TTH],append(O1,[O2],O3),
+    corregirPixel(MaxY,MaxX,NcontX,ContY,T,O3,Out).
+
+corregirPixelesImagen(Imagen,Iout):-
+    getAncho(Imagen,Ancho),getAlto(Imagen,Alto),
+    MaxX is Ancho-1, MaxY is Alto-1,
+    getLP(Imagen,LP),
+    corregirPixel(MaxY,MaxX,0,0,LP,_,LP1),
+    Iout = [Ancho,Alto,LP1].
+
+imageDepthLayers(Imagen,DepthLayers):-
+    agregarAncAlt2(Imagen,LOLDOut),!,
+    maplist(corregirPixelesImagen,LOLDOut,DepthLayers),!.
