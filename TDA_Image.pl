@@ -202,10 +202,15 @@ imageIsHexmap([_,_,LP|_]):-
 
 % imageIsCompressed
 
-imageIsCompressed([Ancho,Alto,LP|_]):-
-    largolista(LP,LL),
+imageIsCompressed(Imagen):-
+	largolista(Imagen,LargoI),
+	LargoI = 4,
+	getLP(Imagen,LP),
+    getAncho(Imagen,Ancho),
+    getAlto(Imagen,Alto),
+    largolista(LP,LargoLP),
     Area = Ancho*Alto,
-    Area>LL.
+    Area>LargoLP.
 
 % Ordena una imagen con sus pixeles desordenados
 
@@ -549,3 +554,10 @@ corregirPixelesImagen(Imagen,Iout):-
 imageDepthLayers(Imagen,DepthLayers):-
     agregarAncAlt2(Imagen,LOLDOut),!,
     maplist(corregirPixelesImagen,LOLDOut,DepthLayers),!.
+	
+% DECOMPRESS --------------------------------------------
+
+imageDecompress(Imagen,IOut):-
+	imageIsCompressed(Imagen),
+    reverse(Imagen,I),
+	getPrimero(I,IOut).
