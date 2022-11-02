@@ -1,314 +1,8 @@
-/*
-  ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   
- |______| |______| |______| |______| |______| |______| |______| |______| |______| |______| |______|  
-  _______   _____                 _____    _____  __   __  ____    _____   _______            _____  
- |__   __| |  __ \      /\       |  __ \  |_   _| \ \ / / |  _ \  |_   _| |__   __|          |  __ \ 
-    | |    | |  | |    /  \      | |__) |   | |    \ V /  | |_) |   | |      | |     ______  | |  | |
-    | |    | |  | |   / /\ \     |  ___/    | |     > <   |  _ <    | |      | |    |______| | |  | |
-    | |    | |__| |  / ____ \    | |       _| |_   / . \  | |_) |  _| |_     | |             | |__| |
-    |_|    |_____/  /_/    \_\   |_|      |_____| /_/ \_\ |____/  |_____|    |_|             |_____/ 
-  ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   
- |______| |______| |______| |______| |______| |______| |______| |______| |______| |______| |______|
-
--DOMINIOS: 
-	Y: Integer (Coordenada Y del pixel)
-	X: Integer (Coordenada X del pixel)
-	Bt: Integer (Bit: Valor 0 o 1)
-	D: Integer (Posicion en profundidad del pixel)
-	Pixel: List (pixbit_d)
-	Yout: Integer
-	Xout: Integer
-	Bitout: Integer
-	Depthout: Integer
-	LargoLista: Integer
-	L: List
-
--PREDICADOS: 
-	pixbit_d(Y,X,Bt,D,[Y,X,Bt,D]) { Aridad = 5 }
-	getY(Pixel,Yout) { Aridad = 2 }
-	getX(Pixel,Xout) { Aridad = 2 }
-	getBit(Pixel,Bitout) { Aridad = 2 }
-	getDepth(Pixel,Depthout) { Aridad = 2 }
-    isBit(Bt) { Aridad = 1 }
-	ispixbit_d(L) { Aridad = 1 }
-	largolista(Lista, LargoLista) { Aridad = 2 }
-
--METAS PRINCIPALES: 
-
-	pixbit
-
--METAS SECUNDARIAS: 
-
-	getY, getX, getBit, getDepth, largolista, ispixbit_d
-	
-REPRESENTACION: Pixbit es una lista de 4 elementos, Coordenada Y, coordenada X, Bit y Profundidad
-	
-*/
-
-% CLAUSULAS:
-% REGLAS:
-
-%Constructor --------------------------------------
-
-%Dominio: Integer, Integer, Integer, Integer, List
-%Descripción: Constructor de un pixbit-d
-
-pixbit(Y,X,Bt,D,[Y,X,Bt,D]):-
-    integer(Y), integer(X), integer(D),
-    Bt = 0,!; Bt = 1,!.
-	
-%Selectores ----------------------------------------
-
-%Dominio: Pixel, Integer
-%Descripción: Obteniene coordenada Y
-
-getY([Y|_],Yout):-
-    Yout is Y.
-
-%Dominio: Pixel, Integer
-%Descripción: Obteniene coordenada X
-
-getX([_,X|_],Xout):-
-    Xout is X.
-
-%Dominio: Pixel, Integer
-%Descripción: Obteniene valor del bit
-
-getBit([_,_,Bt|_],Bitout):-
-    isBit(Bt),
-    Bitout is Bt.
-
-%Dominio: Pixel, Integer
-%Descripción: Obteniene valor de profundidad (Depth)
-
-getDepth(Pixel,Depthout):-
-	reverse(Pixel,[Depthout|_]).
-	
-%Pertenencia --------------------------------------
-
-%Dominio: Integer
-%Descripción: Verficia si es un bit
-
-isBit(Bit):-
-    Bit = 0,!; Bit = 1,!.
-
-%Dominio: List 
-%Descripción: Verifica si la lista es un pixbit-d
-
-ispixbit_d(L):-
-    largolista(L,4),
-    getY(L,Y),
-    getX(L,X),
-    getBit(L,Bt),
-    getDepth(L,D),
-    pixbit(Y,X,Bt,D,_).
-
-%Otros ---------------------------------------------
-
-%Dominio: List, Integer
-%Descripción: largo de una lista
-
-largolista([],0). % Caso Base
-
-largolista([_|Y], LargoLista):-
-    largolista(Y, N1),
-    LargoLista is N1+1.
-	
-%------------------------------------------------------------------------------------------------
-
+:- include(tda_pixbit_21055282_BerriosEstay).
+:- include(tda_pixrgb_21055282_BerriosEstay).
+:- include(tda_pixhex_21055282_BerriosEstay).
 
 /*
-
-  ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   
- |______| |______| |______| |______| |______| |______| |______| |______| |______| |______| |______|  
-  _______   _____                 _____    _____  __   __  _____     _____   ____             _____  
- |__   __| |  __ \      /\       |  __ \  |_   _| \ \ / / |  __ \   / ____| |  _ \           |  __ \ 
-    | |    | |  | |    /  \      | |__) |   | |    \ V /  | |__) | | |  __  | |_) |  ______  | |  | |
-    | |    | |  | |   / /\ \     |  ___/    | |     > <   |  _  /  | | |_ | |  _ <  |______| | |  | |
-    | |    | |__| |  / ____ \    | |       _| |_   / . \  | | \ \  | |__| | | |_) |          | |__| |
-    |_|    |_____/  /_/    \_\   |_|      |_____| /_/ \_\ |_|  \_\  \_____| |____/           |_____/ 
-  ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   
- |______| |______| |______| |______| |______| |______| |______| |______| |______| |______| |______|
- 
-
--DOMINIOS: 
-	Y: Integer (Coordenada Y del pixel)
-	X: Integer (Coordenada X del pixel)
-	R: Integer (Valor entre 0 y 255)
-	G: Integer (Valor entre 0 y 255)
-	B: Integer (Valor entre 0 y 255)
-	D: Integer (Posicion en profundidad del pixel)
-	Pixel: List (pixrgb_d)
-	Rout: Integer
-	Gout: Integer
-	Bout: Integer
-	RGB: List ([R,G,B])
-	L: List
-
--PREDICADOS: 
-	pixrgb(Y,X,R,G,B,D,[Y,X,R,G,B,D]) { Aridad = 7 }
-	getR(Pixel,Rout) { Aridad = 2 }
-	getG(Pixel,Gout) { Aridad = 2 }
-	getB(Pixel,Bout) { Aridad = 2 }
-	getRGB(Pixel,RGB) { Aridad = 2 }
-    isRGB(RGB) { Aridad = 1 }
-	ispixrgb_d(L) { Aridad = 1 }
-
--METAS PRINCIPALES: 
-
-	pixrgb
-
--METAS SECUNDARIAS: 
-	getR, getG, getB, getRGB, ispixrgb_d
-	
-REPRESENTACION: Pixrgb es una lista de 6 elementos, Coordenada Y, coordenada X, canal R, canal G, canal B y Profundidad
-	
-*/
-
-% CLAUSULAS:
-% REGLAS:
-
-% Constructor -------------------------------------
-
-%Dominio: Integer, Integer, Integer, Integer, Integer, Integer, List
-%Descripción: Constructor de un pixrgb-d
-
-pixrgb(Y,X,R,G,B,D,[Y,X,R,G,B,D]):-
-    integer(Y), integer(X), integer(D),
-    R>=0, 255>=R, 
-    G>=0, 255>=G,
-    B>=0, 255>=B.
-
-% Selectores ----------------------------------------
-
-%Dominio: Pixel, Integer
-%Descripción: Obtener valor del canal R
-
-getR([_,_,R|_],Rout):-
-    isRGB(R),
-    Rout = R.
-
-%Dominio: Pixel, Integer
-%Descripción: Obtener valor del canal G
-
-getG([_,_,_,G|_],Gout):-
-    isRGB(G),
-    Gout = G.
-
-%Dominio: Pixel, Integer
-%Descripción: Obtener valor del canal B
-
-getB([_,_,_,_,B|_],Bout):-
-    isRGB(B),
-    Bout = B.
-
-%Dominio: Pixel, List
-%Descripción: Obtiene una lista con los canales del pixrgb
-
-getRGB(Pixel,RGB):-
-    getR(Pixel,R),getG(Pixel,G),getB(Pixel,B),
-    RGB = [R,G,B].
-	
-%Pertenencia ----------------------------------
-
-isRGB(RGB):-
-    RGB>=0, 255>=RGB.
-
-%Dominio: List 
-%Descripción: Verifica si la lista es un pixrgb-d
-
-ispixrgb_d(L):-
-    largolista(L,6),
-    getY(L,Y),
-    getX(L,X),
-    getR(L,R),
-    getG(L,G),
-    getB(L,B),
-    getDepth(L,D),
-    pixrgb(Y,X,R,G,B,D,_).
-	
-%------------------------------------------------------------------------------------------------
-
-
-
-/*
-
-  ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   
- |______| |______| |______| |______| |______| |______| |______| |______| |______| |______| |______|  
-  _______   _____                 _____    _____  __   __  _    _   ______  __   __           _____  
- |__   __| |  __ \      /\       |  __ \  |_   _| \ \ / / | |  | | |  ____| \ \ / /          |  __ \ 
-    | |    | |  | |    /  \      | |__) |   | |    \ V /  | |__| | | |__     \ V /   ______  | |  | |
-    | |    | |  | |   / /\ \     |  ___/    | |     > <   |  __  | |  __|     > <   |______| | |  | |
-    | |    | |__| |  / ____ \    | |       _| |_   / . \  | |  | | | |____   / . \           | |__| |
-    |_|    |_____/  /_/    \_\   |_|      |_____| /_/ \_\ |_|  |_| |______| /_/ \_\          |_____/ 
-  ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   
- |______| |______| |______| |______| |______| |______| |______| |______| |______| |______| |______|  
-
-
--DOMINIOS: 
-	Y: Integer (Coordenada Y del pixel)
-	X: Integer (Coordenada X del pixel)
-	Hx: String (String de un codigo hexadecimal #------)
-	D: Integer (Posicion en profundidad del pixel)
-	Pixel: pixhex_d
-	Hout: String
-	L: List
-
--PREDICADOS: 
-	pixhex_d(Y,X,Hx,D,[Y,X,Hx,D]) { Aridad = 5 }
-	getH(Pixel,Hout) { Aridad = 2 }
-	ispixhex_d(L) { Aridad = 1 }
-
--METAS PRINCIPALES: 
-
-	pixhex
-
--METAS SECUNDARIAS: 
-	getH, ispixhex_d
-	
-REPRESENTACION: Pixhex es una lista de 4 elementos, Coordenada Y, coordenada X, Hex y Profundidad
-
-*/
-
-% CLAUSULAS:
-% REGLAS:
-
-% Constructor ---------------------------------
-
-%Dominio: Integer, Integer, String, Integer, List
-%Descripción: Constructor de un pixhex-d
-
-pixhex(Y,X,Hx,D,[Y,X,Hx,D]):-
-    integer(Y), integer(X), 
-    string(Hx), integer(D).
-	
-% Selectores -----------------------------------
-
-%Dominio: Pixel, Sting
-%Descripción: Obtener color hexadecimal string del pixel
-
-getHex([_,_,Hx|_],Hout):-
-    string(Hx),
-    Hout = Hx.
-
-% Pertenencia ----------------------------------
-
-%Dominio: List 
-%Descripción: Verifica si la lista es un pixhex-d
-
-ispixhex_d(L):-
-    largolista(L,4),
-    getY(L,Y),
-    getX(L,X),
-    getHex(L,Hx),
-    getDepth(L,D),
-    pixhex(Y,X,Hx,D,_).
-	
-%------------------------------------------------------------------------------------------------
-
-
-/*
-
   ______   ______   ______   ______   ______   ______   ______   ______   ______   ______   ______ 
  |______| |______| |______| |______| |______| |______| |______| |______| |______| |______| |______|
   _______   _____                 _____   __  __               _____   ______   _   _              
@@ -342,18 +36,18 @@ ispixhex_d(L):-
 	P: Elemento (Primer elemento de una lista)
 	
 -PREDICADOS: 
-	image(Ancho,Alto,LP,Iout)
-	homologo(LP)
-	comparar_area_pix(Ancho,Alto,Pixel)
-	isdentrodelarea(Ancho,Alto,LP)
-	getAlto(Imagen,Alout)
-	getAncho(Imagen,Anout)
-	getLP(Imagen,LPout)
-	getMinLista(L,Nmin)
-	getMinLista2(H,L,Nmin)
-	delrepe(L,Lout)
-	getTail(L,T)
-	getPrimero(L,H)
+	image(Ancho,Alto,LP,Iout) { Aridad = 4 }
+	homologo(LP) { Aridad = 1 }
+	comparar_area_pix(Ancho,Alto,Pixel) { Aridad = 3 }
+	isdentrodelarea(Ancho,Alto,LP) { Aridad = 3 }
+	getAlto(Imagen,Alout) { Aridad = 2 }
+	getAncho(Imagen,Anout) { Aridad = 2 }
+	getLP(Imagen,LPout) { Aridad = 2 }
+	getMinLista(L,Nmin) { Aridad = 2 }
+	getMinLista2(H,L,Nmin) { Aridad = 3 }
+	delrepe(L,Lout) { Aridad = 2 } 
+	getTail(L,T) { Aridad = 2 }
+	getPrimero(L,H) { Aridad = 2 }
 
 -METAS PRINCIPALES: 
 
@@ -386,7 +80,7 @@ image(Ancho,Alto,LP,Iout):-
 	Largo>=LargoLista,
     homologo(LP),
     isdentrodelarea(Ancho,Alto,LP),
-    Iout = [Alto,Ancho,LP].
+    Iout = [Ancho,Alto,LP].
 
 %Pertenencia --------------------------------------------
 
@@ -509,7 +203,7 @@ imageIsBitmap([_,_,LP|_]):-
 	Imagen: image
 
 -PREDICADO:
-	imageIsPixmap(Imagen)
+	imageIsPixmap(Imagen) { Aridad = 1 }
 
 -META PRINCIPAL:
 	imageIsPixmap
@@ -533,7 +227,7 @@ imageIsPixmap([_,_,LP|_]):-
 	Imagen: image
 
 -PREDICADO:
-	imageIsHexmap(Imagen)
+	imageIsHexmap(Imagen) { Aridad = 1 }
 
 -META PRINCIPAL:
 	imageIsHexmap
@@ -560,7 +254,7 @@ imageIsHexmap([_,_,LP|_]):-
 	Imagen: imagen
 
 -PREDICADO:
-	imageIsCompressed(Imagen)
+	imageIsCompressed(Imagen) { Aridad = 1 }
 
 -META PRINCIPAL:
 	imageIsCompressed
@@ -594,9 +288,9 @@ imageIsCompressed(Imagen):-
 	Pixel: pixbit_d o pixrgb_d o pixhex_d
 	
 -PREDICADOS:
-	imageFlipH(Imagen,Iout)
-	flopH(Ancho,Pixel,Pout)
-	reordenar(Imagen,Iout)
+	imageFlipH(Imagen,Iout) { Aridad = 2 }
+	flopH(Ancho,Pixel,Pout) { Aridad = 2 }
+	reordenar(Imagen,Iout) { Aridad = 2 }
 
 -METAS PRINCIPALES:
 	imageFlipH
@@ -654,8 +348,8 @@ reordenar(Imagen,Iout):-
 	Pixel: pixbit_d o pixrgb_d o pixhex_d
 	
 -PREDICADOS:
-	imageFlipV(Imagen,Iout)
-	flopV(Ancho,Pixel,Pout)
+	imageFlipV(Imagen,Iout) { Aridad = 2 }
+	flopV(Ancho,Pixel,Pout) { Aridad = 3 }
 	
 -METAS PRINCIPALES:
 	imageFlipV
@@ -707,11 +401,11 @@ flopV(Alto,Pix,Pout):-
 	Pout: Pixel
 	
 -PREDICADOS:
-	imageCrop(Imagen,X1,Y1,X2,Y2,Iout)
-	seleccionapixel(X1,Y1,X2,Y2,[Y,X|_])
-	cropear(Imagen,X1,Y1,X2,Y2,Icrop)
-	cambiarY(MinY,[Y|T],Pout)
-	cambiarX(MinX,[Y,X|T],Pout)
+	imageCrop(Imagen,X1,Y1,X2,Y2,Iout) { Aridad = 6 }
+	seleccionapixel(X1,Y1,X2,Y2,[Y,X|_]) { Aridad = 5 }
+	cropear(Imagen,X1,Y1,X2,Y2,Icrop) { Aridad = 6 }
+	cambiarY(MinY,[Y|T],Pout) { Aridad = 3 }
+	cambiarX(MinX,[Y,X|T],Pout) { Aridad = 3 }
 	
 -METAS PRINCIPALES:
 	imageCrop
@@ -784,10 +478,10 @@ cambiarX(MinX,[Y,X|T],Pout):-
 	Pout: List
 	
 -PREDICADOS:
-	imageRGBToHex(Imagen,Iout)
-	tablaHex(RGB,Strout)
-	rgbtohex(RGB,Srgb,Sout)
-	pixRGBtoHex(Pixel,Pout)
+	imageRGBToHex(Imagen,Iout) { Aridad = 2 }
+	tablaHex(RGB,Strout) { Aridad = 2 }
+	rgbtohex(RGB,Srgb,Sout) { Aridad = 3 }
+	pixRGBtoHex(Pixel,Pout) { Aridad = 2 }
 	
 -METAS PRINCIPALES:
 	imageRGBtoHex
@@ -858,8 +552,8 @@ pixRGBtoHex([Y,X,R,G,B,D],Pout):-
 	L: List
 	
 -PREDICADOS:
-	histogram(Imagen,Histogram)
-	contar(Cont,LP,Color,[Color,Cont])
+	histogram(Imagen,Histogram) { Aridad = 2 }
+	contar(Cont,LP,Color,[Color,Cont]) { Aridad = 3 }
 	
 -METAS PRINCIPALES:
 	histogram
@@ -911,8 +605,8 @@ contar(Cont,[H|T],Color,ColorCont):-
 	IR90: image
 	
 -PREDICADOS:
-	imageRotate90(Imagen,IR90)
-	rotate(Pixel,Pixel)
+	imageRotate90(Imagen,IR90) { Aridad = 2 }
+	rotate(Pixel,Pixel) { Aridad = 2 }
 	
 -METAS PRINCIPALES:
 	imageRotate90
@@ -956,11 +650,11 @@ rotate([Y,X|T],[X,Y|T]).
 	Iout: image
 	
 -PREDICADOS:
-	imageCompress(Imagen,ICompressed)
-	compararRGB(RGB,Pix)
-	compararBit(Bit,Pix)
-	compararHex(Hex,Pix)
-	eliminarColorRepetido(Color,Imagen,Iout)
+	imageCompress(Imagen,ICompressed) { Aridad = 2 } 
+	compararRGB(RGB,Pix) { Aridad = 2 }
+	compararBit(Bit,Pix) { Aridad = 2 }
+	compararHex(Hex,Pix) { Aridad = 2 }
+	eliminarColorRepetido(Color,Imagen,Iout) { Aridad = 3 }
 	
 -METAS PRINCIPALES:
 	imageCompress
@@ -1039,8 +733,8 @@ eliminarColorRepetido(Color,Imagen,Iout):-
 	Pout: Pixel
 	
 -PREDICADOS:
-	imageChangePixel(Imagen,NPix,Iout)
-	cambiarPix(Pixel,[Y,X|_],Pout)
+	imageChangePixel(Imagen,NPix,Iout) { Aridad = 3 }
+	cambiarPix(Pixel,[Y,X|_],Pout) { Aridad = 3 }
 	
 -METAS PRINCIPALES:
 	imageCompress
@@ -1089,8 +783,8 @@ cambiarPix([Y1,X1|_],[Y,X|T],Pout):-
 
 	
 -PREDICADOS:
-	imageInvertColorRGB([An,Al,LP|T],[An,Al,LPI|T])
-	pixinvertColorRGB([Y,X,R,G,B,D],[Y,X,NewR,NewG,NewB,D])
+	imageInvertColorRGB([An,Al,LP|T],[An,Al,LPI|T]) { Aridad = 2 }
+	pixinvertColorRGB([Y,X,R,G,B,D],[Y,X,NewR,NewG,NewB,D]) { Aridad = 2 }
 	
 -METAS PRINCIPALES:
 	imageInvertColorRGB
@@ -1130,9 +824,9 @@ pixinvertColorRGB([Y,X,R,G,B,D],[Y,X,NewR,NewG,NewB,D]):-
 
 	
 -PREDICADOS:
-	imageToString(Imagen,IString)
-	colortoString(Pix,CString)
-	setNewLine(Ancho,Pix,NCString)
+	imageToString(Imagen,IString) { Aridad = 2 }
+	colortoString(Pix,CString) { Aridad = 2 }
+	setNewLine(Ancho,Pix,NCString) { Aridad = 3 }
 
 	
 -METAS PRINCIPALES:
@@ -1204,23 +898,23 @@ setNewLine(Ancho,Pix,NCString):-
 	
 	
 -PREDICADOS:
-	imageDepthLayers(Imagen,DepthLayers)
-	getDepthList(Imagen,DL)
-	selectPixDepth(Depth,Pix,Pout)
-	selectLPDepth(LP,D,H1)
-	listOfLPDepth(Imagen,LOLD)
-	rellenarBit(Depth,Pix,NPix)
-	rellenarPix(Depth,Pix,NPix)
-	rellenarHex(Depth,Pix,NPix)
-	getDepthLPOD(LPOD,Depth)
-	rellenarBit2(LPOD,LPODRellenado)
-	rellenarPix2(LPOD,LPODRellenado)
-	rellenarHex2(LPOD,LPODRellenado)
-	rellenarPixBlancos(Imagen,LOLDRellenado)
-	agregarAncAlt(An,Al,LPOD,LPODOut)
-	agregarAncAlt2(Imagen,LOLDOut)
-	corregirPixel(MaxY,MaxX,ContX,ContY,L,O1,Out)
-	corregirPixelesImagen(Imagen,Iout)
+	imageDepthLayers(Imagen,DepthLayers) { Aridad = 2 } 
+	getDepthList(Imagen,DL) { Aridad = 2 } 
+	selectPixDepth(Depth,Pix,Pout) { Aridad = 3 } 
+	selectLPDepth(LP,D,H1) { Aridad = 3 } 
+	listOfLPDepth(Imagen,LOLD) { Aridad = 2 } 
+	rellenarBit(Depth,Pix,NPix) { Aridad = 3 } 
+	rellenarPix(Depth,Pix,NPix) { Aridad = 3 } 
+	rellenarHex(Depth,Pix,NPix) { Aridad = 3 } 
+	getDepthLPOD(LPOD,Depth) { Aridad = 2 } 
+	rellenarBit2(LPOD,LPODRellenado) { Aridad = 2 } 
+	rellenarPix2(LPOD,LPODRellenado) { Aridad = 2 } 
+	rellenarHex2(LPOD,LPODRellenado) { Aridad = 2 } 
+	rellenarPixBlancos(Imagen,LOLDRellenado) { Aridad = 2 } 
+	agregarAncAlt(An,Al,LPOD,LPODOut) { Aridad = 4 } 
+	agregarAncAlt2(Imagen,LOLDOut) { Aridad = 2 } 
+	corregirPixel(MaxY,MaxX,ContX,ContY,L,O1,Out) { Aridad = 7 } 
+	corregirPixelesImagen(Imagen,Iout) { Aridad = 2 } 
 
 	
 -METAS PRINCIPALES:
@@ -1376,7 +1070,7 @@ corregirPixelesImagen(Imagen,Iout):-
 
  % ----------------------------------------------------------------------------
 /* ----------------------------------------------------------------------------
----------------------  TDA IMAGE - IMAGEDECOMPRESS --------------------------------
+---------------------  TDA IMAGE - IMAGEDECOMPRESS ----------------------------
 -------------------------------------------------------------------------------
 
 -DOMINIOS:
@@ -1384,7 +1078,7 @@ corregirPixelesImagen(Imagen,Iout):-
 	IOut: Image
 	
 -PREDICADOS:
-	imageDecompress(Imagen,IOut)
+	imageDecompress(Imagen,IOut) { Aridad = 2 }
 
 -METAS PRINCIPALES:
 	imageDecompress
