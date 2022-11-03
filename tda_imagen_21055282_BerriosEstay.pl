@@ -1,5 +1,4 @@
-:- include(tda_pixbit_21055282_BerriosEstay).
-:- include(tda_pixrgb_21055282_BerriosEstay).
+
 :- include(tda_pixhex_21055282_BerriosEstay).
 
 /*
